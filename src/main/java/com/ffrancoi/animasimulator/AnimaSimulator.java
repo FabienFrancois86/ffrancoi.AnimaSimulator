@@ -6,6 +6,8 @@ package com.ffrancoi.animasimulator;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.*;
 
 /**
@@ -42,11 +44,9 @@ public class AnimaSimulator implements ActionListener{
                                                 new JLabel("Defense :", JLabel.CENTER), fieldDefense2, new JLabel("Initiative :", JLabel.CENTER), 
                                                 fieldInit2, new JLabel("Base de dégats :", JLabel.CENTER), fieldBaseDégats2};
     
-    /*
     private JTextField[] allNumeralTextFields = {fieldAttaque1, fieldAttaque2, fieldDefense1,
                                             fieldDefense2, fieldInit1, fieldInit2, fieldBaseDégats1, 
                                             fieldBaseDégats2, fieldPv1, fieldPv2 };
-    */
     
     private JTextField nbCombats = new JTextField(COLS_NB_COMBATS);
     private static String COMMANDE_UN_COMBAT = "uncombat";
@@ -88,12 +88,21 @@ public class AnimaSimulator implements ActionListener{
         JButton combatsMultiples = new JButton("Simulation combats multiples");
         combatsMultiples.setActionCommand(COMMANDE_SIMULATION_MULTIPLE);
         combatsMultiples.addActionListener(this);
+        JButton effacerTexte = new JButton("Effacer texte");
+        effacerTexte.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                rapportCombat.setText("Fenêtre de rapport de combats");
+            }
+        });
         panneauMilieu.add(unCombat);
         panneauMilieu.add(Box.createRigidArea(new Dimension(80,0)));
         panneauMilieu.add(new JLabel("nb Combats : "));
         panneauMilieu.add(nbCombats);
         panneauMilieu.add(Box.createRigidArea(new Dimension(20,0)));
         panneauMilieu.add(combatsMultiples);
+        panneauMilieu.add(Box.createRigidArea(new Dimension(80,0)));
+        panneauMilieu.add(effacerTexte);
         return panneauMilieu;
     }
     
@@ -128,8 +137,43 @@ public class AnimaSimulator implements ActionListener{
     
     @Override
     public void actionPerformed(ActionEvent e){
-        //tester de quel élément l'event vient et agir en fonction
-        rapportCombat.append("\nCeci est un test.");
+        if(vérificationEntiers(allNumeralTextFields)){
+            String cmd = e.getActionCommand();
+            if(COMMANDE_UN_COMBAT.equals(cmd)){
+                Combat duel = this.créationCombat();
+                duel.combatCommenté(rapportCombat);
+            }else if(COMMANDE_SIMULATION_MULTIPLE.equals(cmd)){
+                if(vérificationEntiers(new JTextField[] {nbCombats})){
+                    Combat duel = this.créationCombat();
+                    duel.simulationMultipleCombat(Integer.parseInt(nbCombats.getText()), rapportCombat);
+                }
+            }
+        }else{
+            rapportCombat.append("\nErreur ! Les caractéristiques des personnages doivent être des entiers.");
+        }
+    }
+    
+    public boolean vérificationEntiers(JTextField[] listeDeVérification){
+        Pattern p = Pattern.compile("\\d+");
+        Matcher m;
+        for (JTextField textField : listeDeVérification){
+            m = p.matcher(textField.getText());
+            if(!m.matches()){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public Combat créationCombat(){
+        Personnage a = new Personnage(Integer.parseInt(fieldPv1.getText()),Integer.parseInt(fieldBaseDégats1.getText()),
+                                    Integer.parseInt(fieldAttaque1.getText()),Integer.parseInt(fieldDefense1.getText()),
+                                    fieldNom1.getText(), Integer.parseInt(fieldInit1.getText()));
+        Personnage b = new Personnage(Integer.parseInt(fieldPv2.getText()),Integer.parseInt(fieldBaseDégats2.getText()),
+                                    Integer.parseInt(fieldAttaque2.getText()),Integer.parseInt(fieldDefense2.getText()),
+                                    fieldNom2.getText(), Integer.parseInt(fieldInit2.getText()));
+        Combat duel = new Combat(a,b);
+        return duel;
     }
     
     public static void main(String[] args) {

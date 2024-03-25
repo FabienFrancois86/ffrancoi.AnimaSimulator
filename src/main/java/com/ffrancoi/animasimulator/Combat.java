@@ -4,6 +4,8 @@
  */
 package com.ffrancoi.animasimulator;
 
+import javax.swing.JTextArea;
+
 /**
  *
  * @author fabie
@@ -51,11 +53,11 @@ public class Combat {
         
     }
     
-    public void combatCommenté(){
+    public void combatCommenté(JTextArea rapport){
         while(a.enVie() && b.enVie()){
             compteurTours++;
             tourDeCombat();
-            System.out.println("Le tour de combat " + compteurTours + " est fini. a : " + a.getPv() + 
+            rapport.append("\nLe tour de combat " + compteurTours + " est fini. a : " + a.getPv() + 
                     ". b : " + b.getPv());
         }
     }
@@ -74,7 +76,7 @@ public class Combat {
         b.setEstEnVie(true);
     }
     
-    public void simulationMultipleCombat(int nombre){
+    public void simulationMultipleCombat(int nombre, JTextArea rapport){
         int nombreVictoiresA = 0, nombreVictoiresB = 0;
         for (int i = 0; i < nombre; i++){
             combatNormal();
@@ -85,7 +87,7 @@ public class Combat {
             }
             resetCombat();
         }
-        System.out.println("A a gagné un total de " + nombreVictoiresA + " fois.\nB a gagné un total de " + 
+        rapport.append("\nA a gagné un total de " + nombreVictoiresA + " fois.\nB a gagné un total de " + 
                 nombreVictoiresB + " fois");
     }
 }
