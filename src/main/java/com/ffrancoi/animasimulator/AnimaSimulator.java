@@ -14,8 +14,7 @@ import javax.swing.*;
  */
 public class AnimaSimulator implements ActionListener{
     
-    /*private static final int COLS_COMPS = 4;
-    private static final int COLS_NOM = 30;*/
+    private static final int COLS_NB_COMBATS = 7;
     
     private JPanel panneauPrincipal = new JPanel();
     
@@ -33,15 +32,15 @@ public class AnimaSimulator implements ActionListener{
     private JTextField fieldBaseDégats1 = new JTextField();
     private JTextField fieldBaseDégats2 = new JTextField();
     
-    private JComponent[] composantsPersonnage1 = {new JLabel("Nom :"), fieldNom1, new JLabel("Points de vie :"), fieldPv1, 
-                                                new JLabel("Attaque :"), fieldAttaque1, new JLabel("Defense :"), fieldDefense1,
-                                                new JLabel("Initiative :"), fieldInit1, new JLabel("Base de dégats :"), 
-                                                fieldBaseDégats1};
+    private JComponent[] composantsPersonnage1 = {new JLabel("Nom :", JLabel.CENTER), fieldNom1, new JLabel("Points de vie :", JLabel.CENTER), 
+                                                fieldPv1, new JLabel("Attaque :", JLabel.CENTER), fieldAttaque1, 
+                                                new JLabel("Defense :", JLabel.CENTER), fieldDefense1, new JLabel("Initiative :", JLabel.CENTER), 
+                                                fieldInit1, new JLabel("Base de dégats :", JLabel.CENTER), fieldBaseDégats1};
     
-    private JComponent[] composantsPersonnage2 = {new JLabel("Nom :"), fieldNom2, new JLabel("Points de vie :"), fieldPv2, 
-                                                new JLabel("Attaque :"), fieldAttaque2, new JLabel("Defense :"), fieldDefense2,
-                                                new JLabel("Initiative :"), fieldInit2, new JLabel("Base de dégats :"), 
-                                                fieldBaseDégats2};
+    private JComponent[] composantsPersonnage2 = {new JLabel("Nom :", JLabel.CENTER), fieldNom2, new JLabel("Points de vie :", JLabel.CENTER), 
+                                                fieldPv2, new JLabel("Attaque :", JLabel.CENTER), fieldAttaque2, 
+                                                new JLabel("Defense :", JLabel.CENTER), fieldDefense2, new JLabel("Initiative :", JLabel.CENTER), 
+                                                fieldInit2, new JLabel("Base de dégats :", JLabel.CENTER), fieldBaseDégats2};
     
     /*
     private JTextField[] allNumeralTextFields = {fieldAttaque1, fieldAttaque2, fieldDefense1,
@@ -49,49 +48,76 @@ public class AnimaSimulator implements ActionListener{
                                             fieldBaseDégats2, fieldPv1, fieldPv2 };
     */
     
-    /*private JButton unCombat = new JButton("Simulation un combat");
-    private JLabel LabelNombreCombats = new JLabel("nb Combats");
-    private JTextField nbCombats = new JTextField();
-    private JButton combatsMultiples = new JButton("Simulation combats multiples");
+    private JTextField nbCombats = new JTextField(COLS_NB_COMBATS);
     private static String COMMANDE_UN_COMBAT = "uncombat";
-    private static String COMMANDE_SIMULATION_MULTIPLE = "simulationmultiple";*/
+    private static String COMMANDE_SIMULATION_MULTIPLE = "simulationmultiple";
     
-    //private JTextArea rapportCombat = new JTextArea();
+    private JTextArea rapportCombat = new JTextArea("Fenêtre de rapport de combats",15,80);
 
     public AnimaSimulator(){
-        panneauPrincipal.setLayout(new BoxLayout(panneauPrincipal,BoxLayout.X_AXIS));
-        JPanel grillePersonnage1 = createGridPanel(composantsPersonnage1);
-        grillePersonnage1.setBorder(BorderFactory.createTitledBorder("Personnage A"));
-        JPanel grillePersonnage2 = createGridPanel(composantsPersonnage2);
-        grillePersonnage2.setBorder(BorderFactory.createTitledBorder("Personnage B"));
-        panneauPrincipal.add(Box.createRigidArea(new Dimension(20,0)));
-        panneauPrincipal.add(grillePersonnage1);
-        panneauPrincipal.add(Box.createRigidArea(new Dimension(30,0)));
-        panneauPrincipal.add(grillePersonnage2);
-        panneauPrincipal.add(Box.createRigidArea(new Dimension(20,0)));
-        /*fenetrePrincipale = new JFrame("Test de bouton et texte");
-        panneauPrincipal = new JPanel();
-        ajoutTexte = new JButton("Ajout Texte");
-        ajoutTexte.addActionListener(this);
-        rapportCombat = new JTextArea(10, 50);
-        rapportCombat.setEditable(false);
-        JScrollPane panneauScroll = new JScrollPane(rapportCombat,
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        panneauPrincipal.add(ajoutTexte);
-        */
+        panneauPrincipal.setLayout(new BoxLayout(panneauPrincipal,BoxLayout.Y_AXIS));
+        
+        panneauPrincipal.add(Box.createRigidArea(new Dimension(0,20)));
+        panneauPrincipal.add(this.createCharacterBoxes());
+        panneauPrincipal.add(Box.createRigidArea(new Dimension(0,50)));
+        panneauPrincipal.add(this.createButtonsLayer());
+        panneauPrincipal.add(Box.createRigidArea(new Dimension(0,30)));
+        panneauPrincipal.add(this.createFightLog());
+        panneauPrincipal.add(Box.createRigidArea(new Dimension(0,20)));
     }
     
-    public static JPanel createGridPanel(JComponent[] listeComposants){
+    //Création du haut de l'interface, contenant les champs de caractéristiques des personnages
+    private JPanel createCharacterBoxes(){
+        JPanel panneauGrilles = new JPanel();
+        panneauGrilles.setLayout(new BoxLayout(panneauGrilles,BoxLayout.X_AXIS));
+        panneauGrilles.add(Box.createRigidArea(new Dimension(20,0)));
+        panneauGrilles.add(createGridPanel(composantsPersonnage1, "A"));
+        panneauGrilles.add(Box.createRigidArea(new Dimension(30,0)));
+        panneauGrilles.add(createGridPanel(composantsPersonnage2, "B"));
+        panneauGrilles.add(Box.createRigidArea(new Dimension(20,0)));
+        return panneauGrilles;
+    }
+    
+    //Création de la partie médiane de l'interface, contenant les boutons ainsi qu'un champ pour choisir le nombre de combats
+    private JPanel createButtonsLayer(){
+        JPanel panneauMilieu = new JPanel();
+        panneauMilieu.setLayout(new FlowLayout(FlowLayout.CENTER));
+        JButton unCombat = new JButton("Simulation un combat");
+        unCombat.setActionCommand(COMMANDE_UN_COMBAT);
+        unCombat.addActionListener(this);
+        JButton combatsMultiples = new JButton("Simulation combats multiples");
+        combatsMultiples.setActionCommand(COMMANDE_SIMULATION_MULTIPLE);
+        combatsMultiples.addActionListener(this);
+        panneauMilieu.add(unCombat);
+        panneauMilieu.add(Box.createRigidArea(new Dimension(80,0)));
+        panneauMilieu.add(new JLabel("nb Combats : "));
+        panneauMilieu.add(nbCombats);
+        panneauMilieu.add(Box.createRigidArea(new Dimension(20,0)));
+        panneauMilieu.add(combatsMultiples);
+        return panneauMilieu;
+    }
+    
+    private JPanel createFightLog(){
+        JPanel panneauRapportCombat = new JPanel();
+        rapportCombat.setEditable(false);
+        JScrollPane panneauScroll = new JScrollPane(rapportCombat,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        panneauRapportCombat.add(panneauScroll);
+        return panneauRapportCombat;
+    }
+    
+    private static JPanel createGridPanel(JComponent[] listeComposants, String lettre){
         JPanel grille = new JPanel();
         grille.setLayout(new GridLayout(6,2,0,10));
         for (JComponent composant : listeComposants){
             grille.add(composant);
         }
         grille.setPreferredSize(new Dimension(400,230));
+        grille.setBorder(BorderFactory.createTitledBorder("Personnage " + lettre));
         return grille;
     }
     
-    public static void createAndShowGUI(){
+    private static void createAndShowGUI(){
         JFrame fenetrePrincipale = new JFrame("Anima:Beyond Fantasy - Simulateur de duels");
         AnimaSimulator anima = new AnimaSimulator();
         fenetrePrincipale.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -103,6 +129,7 @@ public class AnimaSimulator implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e){
         //tester de quel élément l'event vient et agir en fonction
+        rapportCombat.append("\nCeci est un test.");
     }
     
     public static void main(String[] args) {
