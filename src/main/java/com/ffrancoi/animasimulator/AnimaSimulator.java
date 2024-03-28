@@ -141,11 +141,13 @@ public class AnimaSimulator implements ActionListener{
             String cmd = e.getActionCommand();
             if(COMMANDE_UN_COMBAT.equals(cmd)){
                 Combat duel = this.créationCombat();
-                duel.combatCommenté(rapportCombat);
+                duel.combatCommenté();
             }else if(COMMANDE_SIMULATION_MULTIPLE.equals(cmd)){
-                if(vérificationEntiers(new JTextField[] {nbCombats})){
+                if(vérificationEntiers(new JTextField[] {nbCombats}) && Integer.parseInt(nbCombats.getText()) > 0){
                     Combat duel = this.créationCombat();
-                    duel.simulationMultipleCombat(Integer.parseInt(nbCombats.getText()), rapportCombat);
+                    duel.simulationMultipleCombat(Integer.parseInt(nbCombats.getText()));
+                }else{
+                    rapportCombat.append("\nErreur ! Le nombre de combats doit être un entier positif.");
                 }
             }
         }else{
@@ -172,7 +174,7 @@ public class AnimaSimulator implements ActionListener{
         Personnage b = new Personnage(Integer.parseInt(fieldPv2.getText()),Integer.parseInt(fieldBaseDégats2.getText()),
                                     Integer.parseInt(fieldAttaque2.getText()),Integer.parseInt(fieldDefense2.getText()),
                                     fieldNom2.getText(), Integer.parseInt(fieldInit2.getText()));
-        Combat duel = new Combat(a,b);
+        Combat duel = new Combat(a, b, rapportCombat);
         return duel;
     }
     
