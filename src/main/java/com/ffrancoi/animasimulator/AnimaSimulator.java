@@ -106,6 +106,7 @@ public class AnimaSimulator implements ActionListener{
         return panneauMilieu;
     }
     
+    //Création de la partie basse de l'interface, contenant la zone de rapport de combat
     private JPanel createFightLog(){
         JPanel panneauRapportCombat = new JPanel();
         rapportCombat.setEditable(false);
@@ -155,6 +156,11 @@ public class AnimaSimulator implements ActionListener{
         }
     }
     
+    /**
+     * Vérifie que les champs JTextField passés en paramètres contiennent des entiers positifs
+     * @param listeDeVérification
+     * @return true si les champs sont tous des entiers positifs, false autrement
+     */
     public boolean vérificationEntiers(JTextField[] listeDeVérification){
         Pattern p = Pattern.compile("\\d+");
         Matcher m;
@@ -167,6 +173,10 @@ public class AnimaSimulator implements ActionListener{
         return true;
     }
     
+    /**
+     * Crée un objet de type Combat à partir des valeurs rentrées dans l'interface par l'utilisateur
+     * @return le Combat créé à partir des valeurs rentrées dans l'interface
+     */
     public Combat créationCombat(){
         Personnage a = new Personnage(Integer.parseInt(fieldPv1.getText()),Integer.parseInt(fieldBaseDégats1.getText()),
                                     Integer.parseInt(fieldAttaque1.getText()),Integer.parseInt(fieldDefense1.getText()),
